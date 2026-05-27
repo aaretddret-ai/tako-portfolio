@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { ArrowUpRight, ExternalLink, ArrowRight } from "lucide-react";
 
-/* ─── Grain overlay (from zarcerog: 0.8s step-end infinite) ─── */
+/* ─── Grain overlay (from zarcerog) ─── */
 function Grain() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-[100] opacity-[0.04]"
+      className="pointer-events-none fixed inset-0 z-[100] opacity-[0.025]"
       style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
         backgroundRepeat: "repeat",
@@ -17,21 +18,7 @@ function Grain() {
   );
 }
 
-/* ─── Floating decorative element (from zarcerog: 8s ease-in-out infinite) ─── */
-function FloatElement() {
-  return (
-    <div
-      aria-hidden
-      className="absolute top-[15%] right-[8%] w-24 h-24 md:w-40 md:h-40 border border-[#D4573A]/20 opacity-30"
-      style={{
-        animation: "flor-float 8s ease-in-out infinite",
-        clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-      }}
-    />
-  );
-}
-
-/* ─── Scroll-triggered reveal (from bornandbredbrand: cubic-bezier(0.16,1,0.3,1)) ─── */
+/* ─── Scroll reveal (from bornandbredbrand: expo-out) ─── */
 function useReveal(threshold = 0.12) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -69,7 +56,7 @@ function Reveal({
       className={className}
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? "none" : "translateY(24px)",
+        transform: visible ? "none" : "translateY(20px)",
         transition: `opacity 0.6s cubic-bezier(0.16,1,0.3,1) ${delay}s, transform 0.6s cubic-bezier(0.16,1,0.3,1) ${delay}s`,
       }}
     >
@@ -78,96 +65,17 @@ function Reveal({
   );
 }
 
-/* ─── Work card background image reveal (from zarcerog: 0.4s opacity) ─── */
-function WorkCardImage() {
-  return (
-    <div className="relative overflow-hidden aspect-[16/9] bg-[#16110D] group/card">
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-opacity duration-400 opacity-0 group-hover/card:opacity-100"
-        style={{
-          backgroundImage:
-            "url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 450%22%3E%3Crect fill=%22%2316110D%22 width=%22800%22 height=%22450%22/%3E%3Ctext x=%22400%22 y=%22225%22 text-anchor=%22middle%22 fill=%22%23D4573A%22 font-family=%22monospace%22 font-size=%2218%22 opacity=%220.3%22%3ESliceSync Dashboard%3C/text%3E%3C/svg%3E')",
-        }}
-      />
-      {/* Dashboard mock inside */}
-      <div className="relative z-10 p-6 md:p-8">
-        <div className="flex items-center gap-2 mb-4 pb-3 border-b border-white/10">
-          <div className="w-2 h-2 rounded-full bg-white/20" />
-          <div className="w-2 h-2 rounded-full bg-white/20" />
-          <div className="w-2 h-2 rounded-full bg-white/20" />
-          <span className="ml-3 text-[10px] text-white/40 font-mono uppercase tracking-widest">
-            Menu performance · this week
-          </span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="border border-white/10 bg-white/[0.02]">
-            <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase tracking-[0.15em] text-white/30 border-b border-white/10">
-              Top sellers
-            </div>
-            {[
-              { name: "Classic Pepperoni", value: "412", hot: true },
-              { name: "Margherita", value: "388" },
-              { name: "Veggie Delight", value: "254" },
-            ].map((i) => (
-              <div
-                key={i.name}
-                className={`flex justify-between px-3 py-2 border-b border-white/5 last:border-0 text-xs font-mono ${
-                  i.hot ? "bg-[#D4573A]/10" : ""
-                }`}
-              >
-                <span className={i.hot ? "text-[#D4573A] font-bold" : "text-white/60"}>
-                  {i.name}
-                </span>
-                <span className="text-white/40 tabular-nums">{i.value}</span>
-              </div>
-            ))}
-          </div>
-          <div className="border border-white/10 bg-white/[0.02]">
-            <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase tracking-[0.15em] text-white/30 border-b border-white/10">
-              Slow sellers
-            </div>
-            {[
-              { name: "Smoky BBQ", value: "41" },
-              { name: "Four Cheese", value: "58" },
-              { name: "Pesto Chicken", value: "63" },
-            ].map((i) => (
-              <div
-                key={i.name}
-                className="flex justify-between px-3 py-2 border-b border-white/5 last:border-0 bg-[#D4573A]/[0.03] text-xs font-mono"
-              >
-                <span className="text-[#D4573A]/80">{i.name}</span>
-                <span className="text-[#D4573A]/50 tabular-nums">{i.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="mt-3 flex flex-wrap items-center gap-3 p-3 border border-dashed border-white/15 bg-white/[0.02]">
-          <span className="text-[11px] font-mono text-white/40">
-            Bundle <span className="text-[#D4573A] font-bold">Smoky BBQ</span> +{" "}
-            <span className="text-[#D4573A] font-bold">Classic Pepperoni</span> at{" "}
-            <span className="text-[#D4573A] font-bold">15% off</span>
-          </span>
-          <button className="ml-auto text-[10px] font-mono font-bold uppercase tracking-widest bg-[#D4573A] text-white px-4 py-2 hover:bg-[#D4573A]/90 transition-colors cursor-pointer">
-            Push live
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#F5E6D3] text-[#1A1209]">
+    <div className="min-h-screen bg-white text-[#15110E]">
       <Grain />
-      <FloatElement />
 
       {/* ─── Nav (from harrygeorge: mix-blend-difference) ─── */}
       <nav className="fixed top-0 left-0 right-0 z-50 mix-blend-difference">
         <div className="flex items-center justify-between px-6 md:px-12 py-5">
-          <a href="/" className="text-white text-sm font-mono font-bold tracking-wider uppercase">
+          <Link href="/" className="text-white text-sm font-mono font-bold tracking-wider uppercase">
             tako
-          </a>
+          </Link>
           <div className="flex items-center gap-8">
             {["work", "about", "contact"].map((s) => (
               <a
@@ -182,11 +90,14 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* ─── Hero (from withradiance: oversized display type, kentokawazoe: extreme left offset) ─── */}
+      {/* ─── Hero (from withradiance: oversized type, kentokawazoe: asymmetric) ─── */}
       <section className="min-h-screen flex items-end px-6 md:px-12 lg:px-24 pb-16 md:pb-24 relative">
+        {/* Decorative accent line (Figma coral-red) */}
+        <div className="absolute top-0 left-6 md:left-12 lg:left-24 w-px h-32 bg-gradient-to-b from-[#D4573A] to-transparent" />
+
         <div className="max-w-[1200px]">
           <Reveal>
-            <p className="text-[10px] font-mono font-bold tracking-[0.25em] uppercase text-[#8B7355] mb-6">
+            <p className="text-[10px] font-mono font-bold tracking-[0.25em] uppercase text-[#D4573A] mb-6">
               Product Designer & Developer
             </p>
           </Reveal>
@@ -206,7 +117,7 @@ export default function Home() {
             </h1>
           </Reveal>
           <Reveal delay={0.16}>
-            <p className="text-sm font-mono text-[#5C4A35] max-w-md leading-relaxed tracking-wide">
+            <p className="text-sm font-mono text-[#7A6E64] max-w-md leading-relaxed tracking-wide">
               Currently crafting interfaces, systems, and experiences.
               Always learning. Always shipping.
             </p>
@@ -214,23 +125,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Work (from zarcerog: work-card-bg-img hover reveal) ─── */}
-      <section id="work" className="px-6 md:px-12 lg:px-24 py-20 md:py-32 border-t border-[#1A1209]/10">
+      {/* ─── Work (from zarcerog: work-card pattern) ─── */}
+      <section id="work" className="px-6 md:px-12 lg:px-24 py-20 md:py-32 border-t border-black/5">
         <div className="max-w-[1200px]">
           <Reveal>
-            <p className="text-[10px] font-mono font-bold tracking-[0.25em] uppercase text-[#8B7355] mb-16">
+            <p className="text-[10px] font-mono font-bold tracking-[0.25em] uppercase text-[#D4573A] mb-16">
               Selected Work
             </p>
           </Reveal>
 
           <Reveal delay={0.08}>
-            <div className="group cursor-pointer">
+            <Link href="/slicesync" className="group block cursor-pointer">
               {/* Tags */}
               <div className="flex flex-wrap gap-2 mb-5">
                 {["Design + Dev", "2026", "Case Study"].map((t) => (
                   <span
                     key={t}
-                    className="text-[9px] font-mono font-bold uppercase tracking-[0.15em] px-3 py-1.5 border border-[#1A1209]/15 text-[#1A1209]"
+                    className="text-[9px] font-mono font-bold uppercase tracking-[0.15em] px-3 py-1.5 border border-black/10 text-[#7A6E64]"
                   >
                     {t}
                   </span>
@@ -238,7 +149,7 @@ export default function Home() {
               </div>
 
               <h2
-                className="leading-[0.9] tracking-[-0.01em] mb-4"
+                className="leading-[0.9] tracking-[-0.01em] mb-4 group-hover:text-[#D4573A] transition-colors duration-300"
                 style={{
                   fontFamily: '"Bebas Neue", "Arial Narrow", sans-serif',
                   fontSize: "clamp(2.5rem, 6vw, 6rem)",
@@ -246,70 +157,114 @@ export default function Home() {
               >
                 SliceSync
               </h2>
-              <p className="text-[#5C4A35] text-sm font-mono max-w-lg leading-relaxed mb-8 tracking-wide">
+              <p className="text-[#7A6E64] text-sm font-mono max-w-lg leading-relaxed mb-6 tracking-wide">
                 A single pane of glass for a regional pizza network that was
                 running on instinct, three spreadsheets, and whatever the POS
                 would export.
               </p>
 
-              {/* Dashboard mock */}
-              <WorkCardImage />
-
-              {/* Metrics */}
-              <div className="flex flex-wrap gap-10 md:gap-16 mt-8">
-                {[
-                  { value: "30–45h", label: "research to handoff" },
-                  { value: "4", label: "features shipped from 16 ideas" },
-                  { value: "3", label: "tabs, zero clutter" },
-                ].map((s) => (
-                  <div key={s.label}>
-                    <div
-                      className="leading-none tracking-[-0.01em]"
-                      style={{
-                        fontFamily: '"Bebas Neue", "Arial Narrow", sans-serif',
-                        fontSize: "clamp(2rem, 4vw, 3rem)",
-                      }}
-                    >
-                      {s.value}
+              {/* Dashboard preview */}
+              <div className="relative overflow-hidden bg-[#16110D] border border-black/5">
+                <div className="p-5 md:p-8">
+                  <div className="flex items-center gap-2 mb-4 pb-3 border-b border-white/10">
+                    <div className="w-2 h-2 rounded-full bg-white/20" />
+                    <div className="w-2 h-2 rounded-full bg-white/20" />
+                    <div className="w-2 h-2 rounded-full bg-white/20" />
+                    <span className="ml-3 text-[10px] text-white/40 font-mono uppercase tracking-widest">
+                      Menu performance · this week
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="border border-white/10 bg-white/[0.02]">
+                      <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase tracking-[0.15em] text-white/30 border-b border-white/10">
+                        Top sellers
+                      </div>
+                      {[
+                        { name: "Classic Pepperoni", value: "412", hot: true },
+                        { name: "Margherita", value: "388" },
+                        { name: "Veggie Delight", value: "254" },
+                      ].map((i) => (
+                        <div
+                          key={i.name}
+                          className={`flex justify-between px-3 py-2 border-b border-white/5 last:border-0 text-xs font-mono ${
+                            i.hot ? "bg-[#D4573A]/10" : ""
+                          }`}
+                        >
+                          <span className={i.hot ? "text-[#D4573A] font-bold" : "text-white/60"}>
+                            {i.name}
+                          </span>
+                          <span className="text-white/40 tabular-nums">{i.value}</span>
+                        </div>
+                      ))}
                     </div>
-                    <div className="text-[10px] font-mono text-[#8B7355] mt-1.5 uppercase tracking-widest">
-                      {s.label}
+                    <div className="border border-white/10 bg-white/[0.02]">
+                      <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase tracking-[0.15em] text-white/30 border-b border-white/10">
+                        Slow sellers
+                      </div>
+                      {[
+                        { name: "Smoky BBQ", value: "41" },
+                        { name: "Four Cheese", value: "58" },
+                        { name: "Pesto Chicken", value: "63" },
+                      ].map((i) => (
+                        <div
+                          key={i.name}
+                          className="flex justify-between px-3 py-2 border-b border-white/5 last:border-0 bg-[#D4573A]/[0.03] text-xs font-mono"
+                        >
+                          <span className="text-[#D4573A]/80">{i.name}</span>
+                          <span className="text-[#D4573A]/50 tabular-nums">{i.value}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                </div>
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-[#D4573A]/0 group-hover:bg-[#D4573A]/5 transition-colors duration-500 flex items-center justify-center">
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-[11px] font-mono font-bold uppercase tracking-widest bg-[#D4573A] px-5 py-2.5 flex items-center gap-2">
+                    View case study
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
               </div>
 
-              {/* CTAs */}
-              <div className="flex flex-wrap gap-3 mt-8">
-                <a
-                  href="https://www.figma.com/proto/Gr36KdFlDjSByvvFiei5H3/SliceSync_Aryan-Arora?page-id=0%3A1&node-id=29-826&viewport=155%2C167%2C0.74&scaling=scale-down&content-scaling=fixed&starting-point-node-id=29%3A826&show-proto-sidebar=1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-[#D4573A] text-white px-5 py-2.5 text-[11px] font-mono font-bold uppercase tracking-widest hover:bg-[#D4573A]/90 transition-colors"
-                >
-                  Watch in action
+              {/* Metrics + CTAs */}
+              <div className="flex flex-wrap items-end justify-between gap-6 mt-6">
+                <div className="flex flex-wrap gap-10 md:gap-16">
+                  {[
+                    { value: "30–45h", label: "research to handoff" },
+                    { value: "4", label: "features from 16 ideas" },
+                    { value: "3", label: "tabs, zero clutter" },
+                  ].map((s) => (
+                    <div key={s.label}>
+                      <div
+                        className="leading-none tracking-[-0.01em]"
+                        style={{
+                          fontFamily: '"Bebas Neue", "Arial Narrow", sans-serif',
+                          fontSize: "clamp(1.8rem, 3vw, 2.5rem)",
+                        }}
+                      >
+                        {s.value}
+                      </div>
+                      <div className="text-[10px] font-mono text-[#7A6E64] mt-1 uppercase tracking-widest">
+                        {s.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#D4573A] flex items-center gap-2 group-hover:gap-3 transition-all duration-300">
+                  Explore project
                   <ArrowUpRight className="w-3.5 h-3.5" />
-                </a>
-                <a
-                  href="https://www.figma.com/design/Gr36KdFlDjSByvvFiei5H3/SliceSync_Aryan-Arora?node-id=0-1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 border border-[#1A1209]/15 text-[#1A1209] px-5 py-2.5 text-[11px] font-mono font-bold uppercase tracking-widest hover:bg-[#1A1209]/5 transition-colors"
-                >
-                  Figma file
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                </span>
               </div>
-            </div>
+            </Link>
           </Reveal>
         </div>
       </section>
 
-      {/* ─── About (from cathydolle: minimal type scale) ─── */}
-      <section id="about" className="px-6 md:px-12 lg:px-24 py-20 md:py-32 border-t border-[#1A1209]/10">
+      {/* ─── About ─── */}
+      <section id="about" className="px-6 md:px-12 lg:px-24 py-20 md:py-32 border-t border-black/5">
         <div className="max-w-[1200px]">
           <Reveal>
-            <p className="text-[10px] font-mono font-bold tracking-[0.25em] uppercase text-[#8B7355] mb-16">
+            <p className="text-[10px] font-mono font-bold tracking-[0.25em] uppercase text-[#D4573A] mb-16">
               About
             </p>
           </Reveal>
@@ -324,14 +279,14 @@ export default function Home() {
             <Reveal delay={0.16}>
               <div className="space-y-8">
                 <div>
-                  <h3 className="text-[9px] font-mono font-bold tracking-[0.2em] uppercase text-[#8B7355] mb-3">
+                  <h3 className="text-[9px] font-mono font-bold tracking-[0.2em] uppercase text-[#7A6E64] mb-3">
                     Tools I reach for
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {["React", "Next.js", "TypeScript", "Figma", "Tailwind"].map((t) => (
                       <span
                         key={t}
-                        className="text-[11px] font-mono px-3 py-1 border border-[#1A1209]/10 text-[#1A1209] tracking-wide"
+                        className="text-[11px] font-mono px-3 py-1 border border-black/10 text-[#43382F] tracking-wide"
                       >
                         {t}
                       </span>
@@ -339,14 +294,14 @@ export default function Home() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-[9px] font-mono font-bold tracking-[0.2em] uppercase text-[#8B7355] mb-3">
+                  <h3 className="text-[9px] font-mono font-bold tracking-[0.2em] uppercase text-[#7A6E64] mb-3">
                     Always exploring
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {["AI interfaces", "Creative coding", "Spatial design"].map((t) => (
                       <span
                         key={t}
-                        className="text-[11px] font-mono px-3 py-1 border border-[#1A1209]/10 text-[#1A1209] tracking-wide"
+                        className="text-[11px] font-mono px-3 py-1 border border-black/10 text-[#43382F] tracking-wide"
                       >
                         {t}
                       </span>
@@ -359,11 +314,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Contact (from zarcerog: .contact-link opacity hover) ─── */}
-      <section id="contact" className="px-6 md:px-12 lg:px-24 py-20 md:py-32 border-t border-[#1A1209]/10">
+      {/* ─── Contact ─── */}
+      <section id="contact" className="px-6 md:px-12 lg:px-24 py-20 md:py-32 border-t border-black/5">
         <div className="max-w-[1200px]">
           <Reveal>
-            <p className="text-[10px] font-mono font-bold tracking-[0.25em] uppercase text-[#8B7355] mb-8">
+            <p className="text-[10px] font-mono font-bold tracking-[0.25em] uppercase text-[#D4573A] mb-8">
               Get in Touch
             </p>
           </Reveal>
@@ -388,16 +343,16 @@ export default function Home() {
       </section>
 
       {/* ─── Footer ─── */}
-      <footer className="px-6 md:px-12 lg:px-24 py-6 border-t border-[#1A1209]/10">
+      <footer className="px-6 md:px-12 lg:px-24 py-6 border-t border-black/5">
         <div className="max-w-[1200px] flex items-center justify-between">
-          <span className="text-[10px] font-mono text-[#8B7355] uppercase tracking-widest">
+          <span className="text-[10px] font-mono text-[#7A6E64] uppercase tracking-widest">
             &copy; 2026 tako
           </span>
           <a
             href="https://x.com/designtako"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[10px] font-mono text-[#8B7355] hover:text-[#1A1209] transition-colors duration-200 uppercase tracking-widest"
+            className="text-[10px] font-mono text-[#7A6E64] hover:text-[#15110E] transition-colors duration-200 uppercase tracking-widest"
           >
             @designtako
           </a>

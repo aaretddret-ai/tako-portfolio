@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<!--
+  SliceSync : Interactive Case Study Experience
+  Author: Aryan Arora
+  Built as a dual-track (manager + designer), hub-and-spoke branching narrative.
+  Self-contained single file. Images intentionally deferred; UI rendered in CSS/SVG.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SliceSync : A Design Story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#F2541B;
+    --orange-soft:#FF7A3D;
+    --orange-tint:#FFEFE6;
+    --blue:#1F4FD1;
+    --blue-soft:#3D6BE8;
+    --blue-tint:#E8EEFF;
+    --ink:#15110E;
+    --ink-2:#43382F;
+    --muted:#7A6E64;
+    --paper:#FBF7F1;
+    --card:#FFFFFF;
+    --line:#EADFD3;
+    --night:#16110D;
+    --night-2:#211913;
+    --ok:#1F9E5A;
+    --warn:#E23B3B;
+    --r-sm:10px; --r:16px; --r-lg:24px; --r-xl:32px;
+    --shadow:0 18px 50px rgba(40,25,12,.12);
+    --shadow-sm:0 6px 22px rgba(40,25,12,.08);
+    --maxw:980px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:var(--paper);color:var(--ink);
+    line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  ::selection{background:var(--orange);color:#fff}
+
+  /* progress */
+  .progress{position:fixed;top:0;left:0;height:4px;width:0;z-index:60;
+    background:linear-gradient(90deg,var(--orange),var(--orange-soft));transition:width .12s linear}
+  .badge-fixed{position:fixed;top:14px;right:16px;z-index:60;font-size:12px;font-weight:700;
+    letter-spacing:.04em;text-transform:uppercase;color:var(--muted);
+    background:rgba(255,255,255,.7);backdrop-filter:blur(8px);
+    padding:7px 12px;border-radius:999px;border:1px solid var(--line)}
+
+  section{padding:96px 24px}
+  .wrap{max-width:var(--maxw);margin:0 auto}
+  .narrow{max-width:760px;margin:0 auto}
+
+  h1{font-size:clamp(52px,11vw,128px);font-weight:900;letter-spacing:-.04em;line-height:.92}
+  h2{font-size:clamp(30px,5vw,52px);font-weight:800;letter-spacing:-.025em;line-height:1.05}
+  h3{font-size:clamp(20px,3vw,27px);font-weight:700;letter-spacing:-.01em}
+  .eyebrow{font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--orange)}
+  .lead{font-size:clamp(18px,2.4vw,22px);color:var(--ink-2)}
+  p{font-size:17px;color:var(--ink-2)}
+  .dim{color:var(--muted)}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  .reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}
+  .reveal.d3{transition-delay:.24s}.reveal.d4{transition-delay:.32s}
+
+  /* ---------- HERO / COLD OPEN (night) ---------- */
+  .hero{background:radial-gradient(140% 120% at 80% 0%,var(--night-2),var(--night));
+    color:#F4ECE2;min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden}
+  .hero .glow{position:absolute;width:560px;height:560px;border-radius:50%;
+    background:radial-gradient(circle,rgba(242,84,27,.35),transparent 60%);
+    top:-160px;right:-120px;filter:blur(20px);animation:flicker 6s ease-in-out infinite}
+  @keyframes flicker{0%,100%{opacity:.7}50%{opacity:1}}
+  .hero h1{color:#fff}
+  .hero .eyebrow{color:var(--orange-soft)}
+  .hero .lead{color:#D9CCBE}
+  .ticket-rail{display:flex;gap:10px;margin:30px 0 6px;flex-wrap:wrap}
+  .ticket{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+    border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;color:#E9DCCD;
+    font-variant-numeric:tabular-nums}
+  .ticket.late{border-color:rgba(226,59,59,.55);color:#FF9C8E}
+  .scroll-cue{margin-top:48px;display:inline-flex;align-items:center;gap:10px;color:#B8A998;
+    font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  .scroll-cue .dot{width:22px;height:34px;border:2px solid #6b5d4e;border-radius:12px;position:relative}
+  .scroll-cue .dot::after{content:"";position:absolute;left:50%;top:7px;width:4px;height:4px;
+    border-radius:50%;background:var(--orange-soft);transform:translateX(-50%);
+    animation:drop 1.6s ease-in-out infinite}
+  @keyframes drop{0%{opacity:0;top:7px}30%{opacity:1}80%{opacity:0;top:18px}100%{opacity:0}}
+
+  /* ---------- shared components ---------- */
+  .scene{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+    padding:34px 34px;box-shadow:var(--shadow-sm);position:relative}
+  .scene .tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:800;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:14px}
+  .scene p{font-size:18px;color:var(--ink)}
+
+  .design-note{background:var(--blue-tint);border-left:5px solid var(--blue);
+    border-radius:0 var(--r) var(--r) 0;padding:24px 26px;margin-top:22px}
+  .design-note .tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:800;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
+  .design-note p{color:#27324d;font-size:16px}
+  .design-note p+p{margin-top:12px}
+
+  .icn{width:16px;height:16px;display:inline-block;vertical-align:-2px}
+  .icn-lg{width:26px;height:26px}
+
+  .fieldwall{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
+  .chip{font-size:12px;font-weight:600;color:var(--ink-2);background:#fff;border:1px solid var(--line);
+    padding:5px 10px;border-radius:8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .chip.hot{background:var(--orange-tint);border-color:#F6C9B2;color:#9A3A12}
+
+  /* micro-choice */
+  .choices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+  .choice{appearance:none;text-align:left;cursor:pointer;background:var(--card);
+    border:1.5px solid var(--line);border-radius:var(--r);padding:18px 18px;
+    font-family:inherit;transition:transform .18s,border-color .18s,box-shadow .18s}
+  .choice:hover{transform:translateY(-3px);box-shadow:var(--shadow-sm);border-color:var(--orange-soft)}
+  .choice:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .choice b{display:block;font-size:16px;color:var(--ink);margin-bottom:4px}
+  .choice span{font-size:13px;color:var(--muted)}
+  .choice.right{border-color:var(--ok);background:#F1FBF5}
+  .choice.wrong{opacity:.5}
+  .choice-feedback{margin-top:18px;font-size:16px;font-weight:600;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-left:5px solid var(--ok);
+    border-radius:0 var(--r) var(--r) 0;padding:18px 22px;display:none}
+  .choice-feedback.show{display:block;animation:pop .5s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* sync flows */
+  .flows{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+  .flow{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+  .flow .h{display:flex;align-items:center;gap:10px;font-weight:700;margin-bottom:8px}
+  .flow .pill{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--blue);background:var(--blue-tint);padding:3px 9px;border-radius:999px}
+  .flow p{font-size:14px}
+  .flow.escape{background:var(--orange-tint);border-color:#F6C9B2}
+  .flow.escape .pill{color:#9A3A12;background:#fff}
+
+  /* ---------- BRANCH ---------- */
+  #branch{background:linear-gradient(180deg,#fff,var(--paper))}
+  .branch-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:36px}
+  .pcard{appearance:none;font-family:inherit;text-align:left;cursor:pointer;position:relative;
+    background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);
+    padding:28px 26px;transition:transform .2s,box-shadow .2s,border-color .2s;overflow:hidden}
+  .pcard:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-color:var(--orange-soft)}
+  .pcard:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+  .pcard .ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
+    background:var(--orange-tint);color:var(--orange);margin-bottom:16px}
+  .pcard h3{margin-bottom:8px}
+  .pcard p{font-size:14.5px}
+  .pcard .go{margin-top:16px;display:inline-flex;align-items:center;gap:8px;
+    font-weight:700;font-size:14px;color:var(--orange)}
+  .pcard .solved{position:absolute;top:18px;right:18px;display:none;align-items:center;gap:6px;
+    font-size:12px;font-weight:800;color:var(--ok)}
+  .pcard.done .solved{display:inline-flex}
+  .pcard.done .ic{background:#EFFBF4;color:var(--ok)}
+
+  /* ---------- SPOKE STAGE ---------- */
+  #stage{display:none}
+  #stage.active{display:block}
+  .spoke-head{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+  .spoke-head .ic{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;
+    background:var(--orange-tint);color:var(--orange);flex:none}
+  .step-label{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--muted);margin:48px 0 10px}
+
+  /* matrix */
+  .matrix{margin-top:8px;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:#fff}
+  .matrix-top{display:grid;grid-template-columns:120px 1fr 1fr;background:#fff}
+  .matrix-top div{padding:12px 14px;font-size:12px;font-weight:800;text-transform:uppercase;
+    letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--line)}
+  .matrix-row{display:grid;grid-template-columns:120px 1fr 1fr;border-bottom:1px solid var(--line)}
+  .matrix-row:last-child{border-bottom:0}
+  .matrix-row .rl{display:flex;align-items:center;padding:14px;font-size:12px;font-weight:800;
+    text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2);background:var(--paper);
+    border-right:1px solid var(--line)}
+  .cell{padding:12px;border-right:1px solid var(--line);min-height:64px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .cell:last-child{border-right:0}
+  .idea{font-size:13px;font-weight:600;padding:7px 11px;border-radius:9px;border:1px solid var(--line);
+    background:#fff;color:var(--ink-2)}
+  .idea.win{background:var(--orange);color:#fff;border-color:var(--orange);font-weight:700;
+    box-shadow:0 8px 22px rgba(242,84,27,.3)}
+  .idea.win .b{display:inline-flex;align-items:center;gap:5px;margin-left:6px;font-size:11px;
+    background:rgba(255,255,255,.22);padding:2px 7px;border-radius:999px}
+  .empty{color:var(--muted);font-size:13px;font-style:italic}
+
+  /* feature mock */
+  .mock{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+    box-shadow:var(--shadow);overflow:hidden;margin-top:8px}
+  .mock-bar{display:flex;align-items:center;gap:8px;padding:13px 18px;border-bottom:1px solid var(--line);
+    background:var(--paper)}
+  .mock-bar .dot{width:11px;height:11px;border-radius:50%;background:#E4D7C8}
+  .mock-bar .ttl{margin-left:8px;font-size:13px;font-weight:700;color:var(--ink-2)}
+  .mock-body{padding:22px}
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .listcard{border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  .listcard .lh{padding:10px 14px;font-size:12px;font-weight:800;text-transform:uppercase;
+    letter-spacing:.06em;color:var(--muted);background:var(--paper);border-bottom:1px solid var(--line)}
+  .row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;
+    border-bottom:1px solid var(--line);font-size:14px}
+  .row:last-child{border-bottom:0}
+  .row .nm{font-weight:600;color:var(--ink)}
+  .row .v{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink-2)}
+  .row.sel{background:var(--orange-tint)}
+  .row.low .v{color:var(--warn)}
+  .control{margin-top:18px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+    background:var(--paper);border:1px dashed var(--line);border-radius:var(--r);padding:16px}
+  .control .txt{font-size:14px;color:var(--ink-2)}
+  .control .pin{font-weight:700;color:var(--orange);background:var(--orange-tint);
+    padding:3px 9px;border-radius:8px}
+  .btn{appearance:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:14px;
+    border:0;border-radius:11px;padding:11px 18px;background:var(--orange);color:#fff;
+    transition:transform .15s,filter .15s}
+  .btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .btn.blue{background:var(--blue)}
+  .live-out{margin-top:16px;display:none}
+  .live-out.show{display:block;animation:pop .5s ease}
+  .live-card{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    border:1.5px solid var(--ok);background:#F1FBF5;border-radius:var(--r);padding:16px 18px}
+  .live-card .lt{font-weight:700;color:var(--ink)}
+  .live-pill{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    color:#fff;background:var(--ok);padding:4px 10px;border-radius:999px;
+    display:inline-flex;align-items:center;gap:6px}
+  .tick{font-size:13px;font-weight:700;color:var(--ok);margin-top:10px;display:flex;align-items:center;gap:6px}
+
+  /* heatmap */
+  .heat{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+  .hr{flex:1;min-width:42px;text-align:center}
+  .hr .hh{font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:600}
+  .hr .hc{height:46px;border-radius:9px;background:var(--blue-tint);position:relative}
+  .hr.peak .hc{outline:2px solid var(--orange);outline-offset:1px}
+
+  /* zones */
+  .zone{display:grid;grid-template-columns:120px 1fr 56px;align-items:center;gap:12px;
+    padding:11px 0;border-bottom:1px solid var(--line)}
+  .zone:last-child{border-bottom:0}
+  .zone .zn{font-weight:600;font-size:14px}
+  .bar{height:9px;border-radius:999px;background:#EEE5D9;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:999px;background:var(--blue)}
+  .zone.bad .bar i{background:var(--warn)}
+  .zone .sc{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;font-size:14px}
+  .zone.bad .sc{color:var(--warn)}
+
+  /* leaderboard */
+  .lb-row{display:grid;grid-template-columns:30px 1fr 80px 110px;align-items:center;gap:10px;
+    padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px}
+  .lb-row:last-child{border-bottom:0}
+  .lb-row .rk{font-weight:800;color:var(--muted)}
+  .lb-row.champ{background:linear-gradient(90deg,var(--orange-tint),#fff)}
+  .lb-row .nm{font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .champ-badge{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    color:#fff;background:var(--orange);padding:3px 8px;border-radius:999px}
+  .lb-row .ot{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ok)}
+  .lb-row .zn{font-size:12px;color:var(--muted)}
+
+  .metric-note{margin-top:22px;font-size:14px;color:var(--blue);font-weight:600;
+    display:flex;align-items:flex-start;gap:10px}
+  .metric-note .icn{margin-top:3px;flex:none}
+
+  .spoke-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:46px;
+    padding-top:30px;border-top:1px solid var(--line)}
+
+  /* finale */
+  #finale{display:none}
+  #finale.show{display:block}
+  .ops-card{background:linear-gradient(135deg,var(--blue),#15349c);color:#fff;
+    border-radius:var(--r-xl);padding:40px;box-shadow:var(--shadow)}
+  .ops-card .eyebrow{color:#A9C0FF}
+  .ops-card p{color:#D6E0FF}
+  .future-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:30px}
+  .fcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px}
+  .fcard .n{font-size:12px;font-weight:800;color:var(--orange);letter-spacing:.1em;text-transform:uppercase}
+  .fcard h3{margin:8px 0}
+  .fcard p{font-size:15px}
+  .metrics{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+  .mtag{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 16px;
+    font-size:13.5px;font-weight:600;color:var(--ink-2)}
+  .mtag b{color:var(--orange)}
+
+  /* close */
+  #close{background:radial-gradient(120% 100% at 50% 0%,var(--night-2),var(--night));color:#F4ECE2}
+  #close h2{color:#fff}
+  #close .lead{color:#D9CCBE}
+  .stat-row{display:flex;flex-wrap:wrap;gap:30px;margin:34px 0}
+  .stat .big{font-size:40px;font-weight:900;color:#fff;letter-spacing:-.02em}
+  .stat .lab{font-size:13px;color:#B8A998;font-weight:600}
+  .cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
+  .cta{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+    font-size:15px;padding:15px 24px;border-radius:14px;transition:transform .15s,filter .15s}
+  .cta:hover{transform:translateY(-2px)}
+  .cta.primary{background:var(--orange);color:#fff}
+  .cta.secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2)}
+  .toolnote{margin-top:30px;font-size:13px;color:#8c7d6d}
+
+  footer{padding:40px 24px;text-align:center;color:var(--muted);font-size:13px;background:var(--night)}
+
+  @media(max-width:760px){
+    section{padding:64px 18px}
+    .choices,.flows,.branch-grid,.cols2,.future-grid{grid-template-columns:1fr}
+    .matrix-top,.matrix-row{grid-template-columns:84px 1fr 1fr}
+    .scene{padding:24px}
+    .lb-row{grid-template-columns:24px 1fr 60px;}
+    .lb-row .zn{display:none}
+    .ops-card{padding:28px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;scroll-behavior:auto!important}
+    .reveal{opacity:1;transform:none;transition:none}
+  }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="badge-fixed" id="chapter">SliceSync</div>
+
+<!-- ============ COLD OPEN ============ -->
+<section class="hero" id="ch-open" data-chapter="The Rush">
+  <div class="glow"></div>
+  <div class="wrap">
+    <p class="eyebrow reveal in">A SliceSync case study · by Aryan Arora</p>
+    <h1 class="reveal in d1">SliceSync</h1>
+    <p class="lead reveal in d2" style="margin-top:18px;max-width:620px">
+      A single pane of glass for a regional pizza network that was running on instinct, three spreadsheets, and whatever the POS would export.
+    </p>
+    <div class="ticket-rail reveal in d3">
+      <span class="ticket">#1184 · 2 pies · make-line</span>
+      <span class="ticket">#1185 · dine-in · T6</span>
+      <span class="ticket late">#1187 · DELIVERY · Eastside · 38 min</span>
+      <span class="ticket">#1188 · 3 pies · oven</span>
+      <span class="ticket late">#1189 · DELIVERY · Eastside · 41 min</span>
+    </div>
+    <p class="lead reveal in d3" style="margin-top:26px;max-width:640px;color:#C9BBAC">
+      It is Friday, 7:40pm. You manage this store. Tickets are stacking on the rail. A driver is late in Eastside again, and you will not hear how angry that customer is until the review lands on Monday. You have a feeling the BBQ pizza is dying, but a feeling is all you have. Your ops manager wants a cross-store comparison by morning.
+    </p>
+    <p class="lead reveal in d4" style="margin-top:20px;color:#fff;font-weight:600">
+      Tonight, instinct stops being enough.
+    </p>
+    <div class="scroll-cue reveal in d4"><span class="dot"></span> Follow the build</div>
+  </div>
+</section>
+
+<!-- ============ THE PILE (research / anchoring) ============ -->
+<section id="ch-pile" data-chapter="The Research">
+  <div class="narrow">
+    <p class="eyebrow reveal">01 · Where I started</p>
+    <h2 class="reveal d1" style="margin-top:10px">Before a single screen, the spreadsheets.</h2>
+    <div class="scene reveal d2" style="margin-top:30px">
+      <span class="tag">In the store</span>
+      <p>Every manager you talk to has the same shoebox: Excel sheets they have babied for years, and the raw exports their POS spits out at close. They trust those numbers because they built them by hand. They do not trust anything new.</p>
+    </div>
+    <div class="design-note reveal d2">
+      <span class="tag">Design decision</span>
+      <p>So I did not design first. I went where the work actually lived and listed every field a manager already sees, down to the column name. SliceSync is built directly on those fields. The first number a manager reads in the product is one they already recognize from their own sheet, which is how a brand-new tool earns trust on day one.</p>
+      <div class="fieldwall">
+        <span class="chip hot">order_time</span><span class="chip hot">pizza_name</span>
+        <span class="chip">order_channel</span><span class="chip hot">delivery_zone</span>
+        <span class="chip">line_total</span><span class="chip">unit_price</span>
+        <span class="chip hot">delivery_time</span><span class="chip">driver_id</span>
+        <span class="chip">tip_amount</span><span class="chip">payment_method</span>
+        <span class="chip hot">pizza_category</span><span class="chip">discount_amount</span>
+        <span class="chip">customer_id</span><span class="chip">shift_id</span>
+        <span class="chip">sales_by_staff</span><span class="chip dim">+ 40 more</span>
+      </div>
+    </div>
+
+    <div class="reveal d2" style="margin-top:40px">
+      <h3>If you were building their dashboard, what would you anchor it on?</h3>
+      <div class="choices" id="anchorChoices">
+        <button class="choice" data-correct="false">
+          <b>Your own read of the floor</b><span>You know this store better than any export.</span>
+        </button>
+        <button class="choice" data-correct="false">
+          <b>A clever new metric</b><span>Invent a score that captures everything at once.</span>
+        </button>
+        <button class="choice" data-correct="true">
+          <b>The exact fields they already track</b><span>The columns living in their sheets today.</span>
+        </button>
+      </div>
+      <div class="choice-feedback" id="anchorFeedback">
+        Right. Instinct does not scale and a clever new metric is a number nobody trusts yet. Anchoring to the fields they already use is the unglamorous choice that makes everything after it believable. That is the whole game.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE PLUMBING (sync) ============ -->
+<section id="ch-sync" data-chapter="The Plumbing" style="background:linear-gradient(180deg,var(--paper),#fff)">
+  <div class="narrow">
+    <p class="eyebrow reveal">02 · Getting the data in</p>
+    <h2 class="reveal d1" style="margin-top:10px">Trust dies at setup.</h2>
+    <p class="lead reveal d2" style="margin-top:16px">
+      Every POS vendor speaks a different language. I studied how Looker handles OAuth connectors and how Tableau manages API extracts, then designed two ways in and one way around.
+    </p>
+    <div class="flows reveal d2">
+      <div class="flow">
+        <div class="h"><span class="pill">OAuth</span></div>
+        <p>Click "Connect POS", approve on the provider's screen, done. We pull on a schedule and subscribe to webhooks for real-time updates.</p>
+      </div>
+      <div class="flow">
+        <div class="h"><span class="pill">API key</span></div>
+        <p>For vendors without OAuth: drop in a key and secret. Configurable sync intervals, plus a "Sync now" button for on-demand refreshes.</p>
+      </div>
+      <div class="flow escape">
+        <div class="h"><span class="pill">Escape hatch</span></div>
+        <p>Not ready to connect live? Drag in an Excel file and map your columns. Skeptics can try the whole product before trusting it with a connection.</p>
+      </div>
+    </div>
+    <div class="design-note reveal d2">
+      <span class="tag">Design decision</span>
+      <p>The escape hatch is the part most analytics tools skip. A manager who has guarded their spreadsheets for years will not hand over live API access to something they have never used. The Excel uploader lets them feel the value first, then connect for real. For city ops, the same screen links multiple POS instances into one consolidated cross-store view, even when each store runs a different platform.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BRANCH ============ -->
+<section id="branch" data-chapter="Pick a problem">
+  <div class="wrap">
+    <p class="eyebrow reveal">03 · The five wounds</p>
+    <h2 class="reveal d1" style="margin-top:10px">Data flowing and trusted. Now the real pain surfaces.</h2>
+    <p class="lead reveal d2" style="margin-top:16px;max-width:680px">
+      Every one of these is currently solved by guessing. You have roughly 30 hours. You cannot build all of it, so this is the part where a product designer earns their keep. Pick the problem you feel tonight, and walk the decision with me.
+    </p>
+    <div class="branch-grid reveal d2" id="branchGrid"></div>
+  </div>
+</section>
+
+<!-- ============ SPOKE STAGE (rendered by JS) ============ -->
+<section id="stage" data-chapter="Solving it">
+  <div class="narrow" id="stageInner"></div>
+</section>
+
+<!-- ============ FINALE: ZOOM OUT ============ -->
+<section id="finale" data-chapter="The bigger picture">
+  <div class="narrow">
+    <p class="eyebrow reveal">04 · Zoom out</p>
+    <h2 class="reveal d1" style="margin-top:10px">From one store to the whole region.</h2>
+    <div class="ops-card reveal d2" style="margin-top:28px">
+      <p class="eyebrow">The city ops manager</p>
+      <h3 style="color:#fff;margin-top:8px">Twelve locations. Three POS vendors. One question every Monday.</h3>
+      <p style="margin-top:12px">Which stores are sliding, and why? SliceSync links every instance into a single consolidated view, even across mismatched platforms, so the cross-store comparison that used to take a night of copy-paste is just the home screen.</p>
+    </div>
+
+    <h3 class="reveal d2" style="margin-top:48px">Where it goes next</h3>
+    <div class="future-grid reveal d2">
+      <div class="fcard"><div class="n">Reactive → Predictive</div><h3>Recommendations</h3><p>Move from "what happened" to "what should happen next." Suggest which bundle or deal fits a specific zone based on its own sales history.</p></div>
+      <div class="fcard"><div class="n">Optimization</div><h3>Promotion engine</h3><p>Bundles and discounts suggested, A/B tested, and refined per zone or store automatically.</p></div>
+      <div class="fcard"><div class="n">People</div><h3>Staff Performance Hub</h3><p>Grow Local Champion into full staff analytics so a delivery agent's metrics surface wherever their name appears.</p></div>
+      <div class="fcard"><div class="n">Scale</div><h3>Multi-location intelligence</h3><p>Region-level, data-backed strategy for city ops, not just store-by-store views.</p></div>
+    </div>
+
+    <h3 class="reveal d2" style="margin-top:48px">How we would know it worked</h3>
+    <div class="metrics reveal d2">
+      <span class="mtag"><b>Lift</b> in low-seller units after Bundle Boost</span>
+      <span class="mtag"><b>Conversion</b> of bundle views to orders</span>
+      <span class="mtag"><b>Reduction</b> in peak-hour prep and wait times</span>
+      <span class="mtag"><b>Staffing changes</b> made from the heatmap</span>
+      <span class="mtag"><b>Order volume</b> recovered from low-rated zones</span>
+      <span class="mtag"><b>CSAT</b> in targeted delivery zones</span>
+      <span class="mtag"><b>Agent attendance</b> after recognition</span>
+      <span class="mtag"><b>Actions taken</b> per session</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLOSE ============ -->
+<section id="close" data-chapter="Handoff">
+  <div class="narrow">
+    <p class="eyebrow reveal">05 · The craft</p>
+    <h2 class="reveal d1" style="margin-top:10px">Built to be handed off.</h2>
+    <p class="lead reveal d2" style="margin-top:16px">
+      Three tabs: Operations, Performance, Leaderboard. One lightweight Figma design system: Inter, bold orange CTAs, calm blue data accents, 2xl rounded cards. High-contrast focus rings, keyboard-friendly modals, SVG charts with screen-reader tags. Every screen scans in seconds, not minutes. Every layer is named and annotated so a developer can read the reasoning, not just the pixels.
+    </p>
+    <div class="stat-row reveal d2">
+      <div class="stat"><div class="big">30–45h</div><div class="lab">research to handoff</div></div>
+      <div class="stat"><div class="big">4</div><div class="lab">features shipped from 16 ideas</div></div>
+      <div class="stat"><div class="big">3</div><div class="lab">tabs, zero clutter</div></div>
+    </div>
+    <div class="cta-row reveal d2">
+      <a class="cta primary" target="_blank" rel="noopener" href="https://www.figma.com/proto/Gr36KdFlDjSByvvFiei5H3/SliceSync_Aryan-Arora?page-id=0%3A1&node-id=29-826&viewport=155%2C167%2C0.74&scaling=scale-down&content-scaling=fixed&starting-point-node-id=29%3A826&show-proto-sidebar=1">
+        <svg class="icn-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+        Watch the dashboard in action
+      </a>
+      <a class="cta secondary" target="_blank" rel="noopener" href="https://www.figma.com/design/Gr36KdFlDjSByvvFiei5H3/SliceSync_Aryan-Arora?node-id=0-1">
+        Open the annotated Figma file
+      </a>
+    </div>
+    <p class="toolnote reveal d2">
+      Research compressed with ChatGPT, Manus.ai and Convergence. Visual exploration with LoveArt.ai and Figr. Designed and prototyped in Figma. The AI did the legwork; the calls were mine.
+    </p>
+  </div>
+</section>
+
+<footer>SliceSync · a design story by Aryan Arora</footer>
+
+<script>
+/* ---------- spoke data ---------- */
+const ICONS = {
+  slice:'<svg class="icn-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-6 9 6-9 13z"/><circle cx="10" cy="9" r="1"/><circle cx="13" cy="13" r="1"/></svg>',
+  clock:'<svg class="icn-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  pin:'<svg class="icn-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  trophy:'<svg class="icn-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M6 4h12v4a6 6 0 0 1-12 0z"/><path d="M6 6H4v2a3 3 0 0 0 2 2.8M18 6h2v2a3 3 0 0 1-2 2.8"/></svg>',
+  check:'<svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  arrow:'<svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
+  graph:'<svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>'
+};
+
+const SPOKES = {
+  bundle:{
+    icon:'slice', label:'Pizzas are dying',
+    cardTitle:'Pizzas are dying on the menu', cardDesc:'You keep or kill items on a hunch. You have never actually known which slow sellers are worth saving.',
+    problemTag:'In the store',
+    problem:'That BBQ pizza you almost pulled last month? You kept it on a hunch. The truth is you have never known which slow sellers are worth saving and which are dead weight. The call has always been gut and last year’s habit.',
+    fields:['pizza_name','pizza_category','quantity','line_total','total_amount'],
+    matrix:[
+      {impact:'High',low:{name:'Bundle Boost Offers',win:true},high:null},
+      {impact:'Medium',low:{name:'Flavor Spotlight Carousel'},high:{name:'Remix & Feedback Loop'}},
+      {impact:'Low',low:{name:'Staff’s Secret Pick'},high:null}
+    ],
+    cut:'Remix was the clever idea: let customers rebuild a weak pizza and track winners. It was also the heaviest build and the slowest to prove anything. Bundle Boost wins because a manager can run it in seconds and see the result on the next ticket. Ship the lever that changes behavior this shift, not next quarter.',
+    buildTitle:'Bundle Boost',
+    mock:`<div class="mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">Menu performance · this week</span></div>
+      <div class="mock-body">
+        <div class="cols2">
+          <div class="listcard"><div class="lh">Top sellers</div>
+            <div class="row sel"><span class="nm">Classic Pepperoni</span><span class="v">412</span></div>
+            <div class="row"><span class="nm">Margherita</span><span class="v">388</span></div>
+            <div class="row"><span class="nm">Veggie Delight</span><span class="v">254</span></div>
+          </div>
+          <div class="listcard"><div class="lh">Slow sellers</div>
+            <div class="row sel low"><span class="nm">Smoky BBQ</span><span class="v">41</span></div>
+            <div class="row low"><span class="nm">Four Cheese</span><span class="v">58</span></div>
+            <div class="row low"><span class="nm">Pesto Chicken</span><span class="v">63</span></div>
+          </div>
+        </div>
+        <div class="control">
+          <span class="txt">Bundle <span class="pin">Smoky BBQ</span> + <span class="pin">Classic Pepperoni</span> at <span class="pin">15% off</span></span>
+          <button class="btn" data-action="bundle">Push live to menu</button>
+        </div>
+        <div class="live-out" data-out="bundle">
+          <div class="live-card"><span class="lt">BBQ + Pepperoni Duo · $18</span><span class="live-pill">${ICONS.check} Live now</span></div>
+          <div class="tick">${ICONS.graph} Smoky BBQ units today: 41 → climbing</div>
+        </div>
+      </div>`,
+    decision:'Friday rush. The BBQ is dragging again. Two clicks: pair it with the Pepperoni everyone already orders, set 15% off, push live. By the second wave of tickets the BBQ is moving. You did not launch a campaign. You made a decision, and the menu changed underneath you.',
+    metric:'Watch: lift in low-seller units, bundle view-to-order conversion, and revenue per bundle over time.'
+  },
+  staffing:{
+    icon:'clock', label:'Staffing is a guess',
+    cardTitle:'Staffing is a guess every shift', cardDesc:'Over-staff and you bleed labor on a dead Tuesday. Under-staff and Friday buries the line. You never see the rush coming.',
+    problemTag:'In the store',
+    problem:'Every roster you have ever built started as a guess. Staff up and you bleed labor on a dead Tuesday. Staff down and Friday 8pm buries the make-line. You have never seen the rush before it walked through the door.',
+    fields:['order_date','order_time','order_channel','number_of_items'],
+    matrix:[
+      {impact:'High',low:{name:'Time Heatmap',win:true},high:{name:'TempoPulse Forecast'}},
+      {impact:'Medium',low:null,high:{name:'ShiftSwap Marketplace'}},
+      {impact:'Low',low:null,high:{name:'Flexi-Task Pods'}}
+    ],
+    cut:'TempoPulse was tempting: a forecasting engine that reads weather, local events and live order rate sounds like the future. But a manager will not trust a black-box prediction on day one, and I had 30 hours. The heatmap shows them their own history in a shape they instantly believe, then lets them act on it. Earn trust with the visible truth before you sell anyone a forecast.',
+    buildTitle:'Time Heatmap with live team allocation',
+    mock:`<div class="mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">Order volume by hour · today</span></div>
+      <div class="mock-body">
+        <div class="heat">
+          ${[['11am',.2],['12pm',.45],['1pm',.4],['2pm',.2],['3pm',.15],['4pm',.25],['5pm',.5],['6pm',.85],['7pm',1],['8pm',.9],['9pm',.55],['10pm',.3]].map(([h,v])=>{
+            const peak = v>=.85; const bg = `rgba(31,79,209,${0.12+v*0.7})`;
+            return `<div class="hr ${peak?'peak':''}"><div class="hh">${h}</div><div class="hc" style="background:${bg}"></div></div>`;
+          }).join('')}
+        </div>
+        <div class="control">
+          <span class="txt">Peak detected <span class="pin">6–8pm</span> · recommend <span class="pin">+1 floater</span> on make-line</span>
+          <button class="btn" data-action="staff">Apply staffing</button>
+        </div>
+        <div class="live-out" data-out="staff">
+          <div class="live-card"><span class="lt">Floater added · 6–8pm make-line</span><span class="live-pill">${ICONS.check} Scheduled</span></div>
+          <div class="tick">${ICONS.graph} Projected peak wait: down, before the rush even starts</div>
+        </div>
+      </div>`,
+    decision:'It is 4pm. The heatmap is already glowing across 6 to 8. You pull one floater onto the make-line for those two hours before a single rush ticket lands. The line never backs up. The save happened at 4pm, not at 7.',
+    metric:'Watch: peak-hour wait time, labor cost on slow shifts, and the number of staffing changes actually made from the heatmap.'
+  },
+  delivery:{
+    icon:'pin', label:'Neighborhoods go dark',
+    cardTitle:'Whole neighborhoods go late', cardDesc:'You hear about a failing delivery zone from a one-star review, days later. There has never been a live map of where the promise breaks.',
+    problemTag:'In the store',
+    problem:'You find out a neighborhood is angry the same way you always have: a one-star review, days late. There has never been a live map of where your delivery promise is quietly breaking, so you only ever fix it after you have already lost the customer.',
+    fields:['delivery_zone','dispatch_time','delivery_time','delivery_status','CSAT'],
+    matrix:[
+      {impact:'High',low:{name:'Delay Zone Actions',win:true},high:{name:'Dynamic Dispatch Buffer'}},
+      {impact:'Medium',low:{name:'Geo-Fenced Alerts'},high:{name:'Driver Leaderboard'}},
+      {impact:'Low',low:null,high:null}
+    ],
+    cut:'Dynamic Dispatch is where this feature eventually goes: an engine that throttles and reallocates drivers by congestion. It is also automation you do not hand a manager before they trust the data underneath it. Delay Zone Actions gives them the map and one honest lever first: see the hurting zone, do something about it today. The buffer is the v2 once the map has earned its keep.',
+    buildTitle:'Delivery Delay Zone Actions',
+    mock:`<div class="mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">CSAT by delivery zone</span></div>
+      <div class="mock-body">
+        <div class="zone"><span class="zn">Downtown</span><span class="bar"><i style="width:92%"></i></span><span class="sc">4.6</span></div>
+        <div class="zone"><span class="zn">Riverside</span><span class="bar"><i style="width:88%"></i></span><span class="sc">4.4</span></div>
+        <div class="zone"><span class="zn">Northgate</span><span class="bar"><i style="width:84%"></i></span><span class="sc">4.2</span></div>
+        <div class="zone bad"><span class="zn">Eastside</span><span class="bar"><i style="width:48%"></i></span><span class="sc">3.1</span></div>
+        <div class="control">
+          <span class="txt">Eastside is below target. Launch a targeted offer to that grid?</span>
+          <button class="btn" data-action="zone">Launch zone promo</button>
+        </div>
+        <div class="live-out" data-out="zone">
+          <div class="live-card"><span class="lt">"We’re on it" offer sent to Eastside · ETA alerts on</span><span class="live-pill">${ICONS.check} Sent</span></div>
+          <div class="tick">${ICONS.graph} Eastside CSAT trend: 3.1 → recovering</div>
+        </div>
+      </div>`,
+    decision:'Eastside is red again. The same zone that buried you on Friday. One click sends a "we’re on it" offer to every customer in that grid and switches on live ETA alerts. Next week Eastside is amber, then it is fine. You stopped a churn spiral with a button, not a meeting.',
+    metric:'Watch: order volume recovered from low-rated zones, CSAT in the targeted zones, and repeat-order churn.'
+  },
+  champion:{
+    icon:'trophy', label:'Best people are invisible',
+    cardTitle:'Your best people are invisible', cardDesc:'Your fastest driver and your slowest one look identical on every report: a name and a number. You have no way to see or reward who carries the hard zones.',
+    problemTag:'In the store',
+    problem:'Your best driver and your slowest one show up the same on every report you have: a name and a number. You have never had a way to see who is carrying the zones nobody wants, let alone a way to reward it.',
+    fields:['driver_id','driver_name','delivery_time','on_time_rate','delivery_zone'],
+    matrix:[
+      {impact:'High',low:{name:'Local Champion Program',win:true},high:null},
+      {impact:'Medium',low:{name:'Hyper-Local Pulse Surveys'},high:{name:'Adaptive SLA Targets'}},
+      {impact:'Low',low:{name:'"Pizza Patrol" Pop-Ups'},high:null}
+    ],
+    cut:'Pizza Patrol is the idea that gets applause in a workshop and dies in a calendar. Adaptive SLAs are smart but invisible to the people doing the work. Local Champion takes data you already have and turns it into recognition, which is the cheapest retention lever a manager owns. Make the people behind the numbers visible.',
+    buildTitle:'Local Champion leaderboard',
+    mock:`<div class="mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">Delivery champions · this week</span></div>
+      <div class="mock-body">
+        <div class="lb-row champ"><span class="rk">1</span><span class="nm">Marcus T. <span class="champ-badge">Champion</span></span><span class="ot">97%</span><span class="zn">Eastside hills</span></div>
+        <div class="lb-row"><span class="rk">2</span><span class="nm">Dana R.</span><span class="ot">95%</span><span class="zn">Riverside</span></div>
+        <div class="lb-row"><span class="rk">3</span><span class="nm">Leo M.</span><span class="ot">92%</span><span class="zn">Downtown</span></div>
+        <div class="lb-row"><span class="rk">4</span><span class="nm">Priya S.</span><span class="ot">90%</span><span class="zn">Northgate</span></div>
+        <div class="control">
+          <span class="txt">Marcus beats target in the zone nobody wants. Spotlight him to the team?</span>
+          <button class="btn" data-action="champ">Celebrate champion</button>
+        </div>
+        <div class="live-out" data-out="champ">
+          <div class="live-card"><span class="lt">Marcus pinned to the team board · "10 min faster than target"</span><span class="live-pill">${ICONS.check} Shared</span></div>
+          <div class="tick">${ICONS.graph} The hardest zone now has someone who owns it</div>
+        </div>
+      </div>`,
+    decision:'Marcus runs the Eastside hills nobody wants and still beats target. Until today that lived in one row of a spreadsheet. Now his name is at the top of the board, the team sees it, and your hardest zone has someone who owns it. Retention is not a program. It is being seen.',
+    metric:'Watch: agent on-time rate and attendance after recognition, and retention in the toughest zones.'
+  }
+};
+
+/* ---------- build branch cards ---------- */
+const grid = document.getElementById('branchGrid');
+const order = ['bundle','staffing','delivery','champion'];
+order.forEach(key=>{
+  const s = SPOKES[key];
+  const b = document.createElement('button');
+  b.className='pcard'; b.dataset.spoke=key; b.setAttribute('aria-label','Solve: '+s.cardTitle);
+  b.innerHTML = `<span class="solved">${ICONS.check} Solved</span>
+    <span class="ic">${ICONS[s.icon]}</span>
+    <h3>${s.cardTitle}</h3>
+    <p>${s.cardDesc}</p>
+    <span class="go">Solve this with me ${ICONS.arrow}</span>`;
+  b.addEventListener('click',()=>openSpoke(key));
+  grid.appendChild(b);
+});
+
+/* ---------- render a spoke ---------- */
+const stage = document.getElementById('stage');
+const stageInner = document.getElementById('stageInner');
+const finale = document.getElementById('finale');
+const solved = new Set();
+
+function openSpoke(key){
+  const s = SPOKES[key];
+  stageInner.innerHTML = `
+    <div class="spoke-head"><span class="ic">${ICONS[s.icon]}</span>
+      <div><p class="eyebrow">Branch · ${s.label}</p><h2 style="margin-top:4px">${s.cardTitle}.</h2></div>
+    </div>
+
+    <div class="scene" style="margin-top:24px"><span class="tag">${s.problemTag}</span><p>${s.problem}</p></div>
+
+    <div class="design-note"><span class="tag">Anchored on</span>
+      <div class="fieldwall">${s.fields.map(f=>`<span class="chip hot">${f}</span>`).join('')}</div>
+    </div>
+
+    <p class="step-label">The cut · effort × impact</p>
+    <div class="matrix">
+      <div class="matrix-top"><div></div><div>Low effort</div><div>High effort</div></div>
+      ${s.matrix.map(r=>`<div class="matrix-row">
+        <div class="rl">${r.impact} impact</div>
+        <div class="cell">${cellHtml(r.low)}</div>
+        <div class="cell">${cellHtml(r.high)}</div>
+      </div>`).join('')}
+    </div>
+    <div class="design-note"><span class="tag">Why this one shipped</span><p>${s.cut}</p></div>
+
+    <p class="step-label">The build</p>
+    <div class="mock">${s.mock}</div>
+
+    <p class="step-label">The decision · act in seconds</p>
+    <div class="scene"><span class="tag">In the store</span><p>${s.decision}</p></div>
+    <div class="metric-note">${ICONS.graph}<span>${s.metric}</span></div>
+
+    <div class="spoke-actions">
+      <button class="btn blue" id="toFinale">See the bigger picture ${ICONS.arrow}</button>
+      <button class="btn ghost" id="another">Solve another problem</button>
+    </div>`;
+
+  stage.classList.add('active');
+  // wire mock buttons
+  stageInner.querySelectorAll('[data-action]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const out = stageInner.querySelector(`[data-out="${btn.dataset.action}"]`);
+      if(out){out.classList.add('show'); btn.disabled=true; btn.style.opacity=.55; btn.textContent='Done';}
+    });
+  });
+  document.getElementById('toFinale').addEventListener('click',revealFinale);
+  document.getElementById('another').addEventListener('click',()=>{
+    document.getElementById('branch').scrollIntoView({behavior:'smooth'});
+  });
+  // mark solved
+  solved.add(key);
+  document.querySelector(`.pcard[data-spoke="${key}"]`)?.classList.add('done');
+  // observe new reveal elements
+  observeAll(stageInner);
+  setTimeout(()=>stage.scrollIntoView({behavior:'smooth'}),60);
+}
+
+function cellHtml(idea){
+  if(!idea) return '<span class="empty">·</span>';
+  if(idea.win) return `<span class="idea win">${idea.name}<span class="b">${ICONS.check} Shipped</span></span>`;
+  return `<span class="idea">${idea.name}</span>`;
+}
+
+function revealFinale(){
+  finale.classList.add('show');
+  observeAll(finale);
+  setTimeout(()=>finale.scrollIntoView({behavior:'smooth'}),60);
+}
+
+/* ---------- anchor micro-choice ---------- */
+document.querySelectorAll('#anchorChoices .choice').forEach(c=>{
+  c.addEventListener('click',()=>{
+    const all=document.querySelectorAll('#anchorChoices .choice');
+    all.forEach(x=>{x.disabled=true; if(x.dataset.correct==='true'){x.classList.add('right');} else {x.classList.add('wrong');}});
+    document.getElementById('anchorFeedback').classList.add('show');
+  });
+});
+
+/* ---------- reveal observer ---------- */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:.14});
+function observeAll(root){ (root||document).querySelectorAll('.reveal:not(.in)').forEach(el=>io.observe(el)); }
+observeAll(document);
+
+/* ---------- scroll progress + chapter label ---------- */
+const prog=document.getElementById('progress');
+const chip=document.getElementById('chapter');
+const chapters=[...document.querySelectorAll('section[data-chapter]')];
+function onScroll(){
+  const h=document.documentElement.scrollHeight-innerHeight;
+  prog.style.width=(scrollY/h*100)+'%';
+  let cur=chapters[0];
+  for(const s of chapters){ if(s.offsetParent!==null && s.getBoundingClientRect().top<innerHeight*0.5) cur=s; }
+  chip.textContent=cur.dataset.chapter;
+}
+addEventListener('scroll',onScroll,{passive:true}); onScroll();
+</script>
+</body>
+</html>
