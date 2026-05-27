@@ -15,6 +15,19 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "tako — Portfolio",
   description: "Product Designer & Developer. I build digital products at the edge of design and code.",
+  openGraph: {
+    title: "tako — Portfolio",
+    description: "Product Designer & Developer. I build digital products at the edge of design and code.",
+    url: "https://tako-portfolio-tau.vercel.app",
+    siteName: "tako",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "tako — Portfolio",
+    description: "Product Designer & Developer. I build digital products at the edge of design and code.",
+  },
 };
 
 export default function RootLayout({
