@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { DM_Sans, DM_Mono } from "next/font/google";
+import { Bebas_Neue, DM_Mono } from "next/font/google";
 import "./globals.css";
 
-const dmSans = DM_Sans({
-  variable: "--font-geist-sans",
+const bebas = Bebas_Neue({
+  variable: "--font-display",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: "400",
 });
 
 const dmMono = DM_Mono({
-  variable: "--font-geist-mono",
+  variable: "--font-mono",
   subsets: ["latin"],
   weight: ["300", "400", "500"],
 });
@@ -43,8 +43,23 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${dmMono.variable} h-full antialiased`}
+      className={`${bebas.variable} ${dmMono.variable} h-full antialiased`}
     >
+      <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+@keyframes flor-float {
+  0% { transform: translate(0px) rotate(0deg); }
+  25% { transform: translate(3px, -4px) rotate(0.5deg); }
+  50% { transform: translate(-2px, 2px) rotate(-0.3deg); }
+  75% { transform: translate(4px, 3px) rotate(0.4deg); }
+  100% { transform: translate(0px) rotate(0deg); }
+}
+`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
